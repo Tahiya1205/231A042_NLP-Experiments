@@ -1,0 +1,7 @@
+# Do not commit recordings, model files, or generated outputs containing speech content.
+data/audio/
+results/**/*.txt
+results/**/*.jsonl
+results/**/*.csv
+.venv/
+__pycache__/
