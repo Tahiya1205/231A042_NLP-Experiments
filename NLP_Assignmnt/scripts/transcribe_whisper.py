@@ -15,6 +15,23 @@ from typing import Any
 from faster_whisper import WhisperModel
 
 
+def patch_pyav_metadata_argument() -> None:
+    """Keep decoding compatible with PyAV builds that omit metadata_errors."""
+    try:
+        import av
+
+        original_open = av.open
+
+        def compatible_open(*args: Any, **kwargs: Any) -> Any:
+            kwargs.pop("metadata_errors", None)
+            return original_open(*args, **kwargs)
+
+        av.open = compatible_open
+    except ImportError:
+        # faster-whisper will raise its own clear dependency error if PyAV is absent.
+        pass
+
+
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     with path.open(encoding="utf-8") as handle:
         return [json.loads(line) for line in handle if line.strip()]
@@ -31,6 +48,7 @@ def main() -> None:
     parser.add_argument("--beam-size", default=5, type=int)
     args = parser.parse_args()
 
+    patch_pyav_metadata_argument()
     device = "cuda" if args.device == "auto" else args.device
     model = WhisperModel(args.model, device=device, compute_type=args.compute_type)
     args.output_dir.mkdir(parents=True, exist_ok=True)

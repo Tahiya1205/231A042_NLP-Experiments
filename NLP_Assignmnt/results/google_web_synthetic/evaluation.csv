@@ -1,0 +1,7 @@
+id,language,status,wer,cer,decision,action_recall
+hi_01,hi,scored,0.1538,0.0467,not evaluated,not evaluated
+hi_02,hi,scored,0.1739,0.1928,not evaluated,not evaluated
+ta_01,ta,scored,0.375,0.0625,not evaluated,not evaluated
+ta_02,ta,scored,0.5238,0.3364,not evaluated,not evaluated
+mr_01,mr,scored,0.15,0.0092,not evaluated,not evaluated
+mr_02,mr,scored,0.5,0.3163,not evaluated,not evaluated

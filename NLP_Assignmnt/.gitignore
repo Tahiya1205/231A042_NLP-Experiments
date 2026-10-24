@@ -4,5 +4,9 @@ results/**/*.txt
 results/**/*.jsonl
 results/**/*.csv
 results/validation_oracle/
+!results/whisper_tiny_synthetic/
+!results/whisper_tiny_synthetic/**
+!results/google_web_synthetic/
+!results/google_web_synthetic/**
 .venv/
 __pycache__/

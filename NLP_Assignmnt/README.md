@@ -17,9 +17,9 @@ The folder is deliberately reproducible. It does **not** contain invented model 
 | Tool | Role in the experiment | Why it is appropriate |
 |---|---|---|
 | [OpenAI Whisper](https://github.com/openai/whisper) (run locally with `faster-whisper`) | Tool A: multilingual ASR baseline | Handles Hindi, Tamil and Marathi, can transcribe uploaded meeting audio locally, and needs no account. |
-| [AI4Bharat IndicConformerASR](https://github.com/AI4Bharat/IndicConformerASR) | Tool B: Indic-language ASR comparison | AI4Bharat provides language-specific ASR models for all 22 scheduled Indian languages, including the three languages in this assignment. |
+| Google Web Speech (via `SpeechRecognition`) | Tool B: independently served ASR comparison | Uses the matching `hi-IN`, `ta-IN`, and `mr-IN` locale for the same consented/synthetic audio. |
 
-Both tools perform the speech-to-text stage of a real meeting-transcript system. The subsequent note-taking stage is evaluated with the gold `decision` and `action_items` annotations in `data/meeting_manifest.jsonl`; this prevents an LLM summary from being accepted without checking whether it preserved decisions and responsibilities.
+Both tools perform the speech-to-text stage of a real meeting-transcript system. The subsequent note-taking stage is reviewed against the gold `decision` and `action_items` annotations in `data/meeting_manifest.jsonl`; this prevents an LLM summary from being accepted without checking whether it preserved decisions and responsibilities.
 
 ## Folder map
 
@@ -34,7 +34,8 @@ NLP_Assignmnt/
 │   └── README.md                # audio and dataset instructions
 ├── scripts/
 │   ├── transcribe_whisper.py    # Tool A runner
-│   ├── make_predictions.py      # imports Tool B transcript files for scoring
+│   ├── transcribe_google_web.py # Tool B runner
+│   ├── make_predictions.py      # imports other-tool transcript files for scoring
 │   ├── evaluate_asr.py          # WER/CER + decision/action scoring
 │   └── extract_notes.py         # template for recording model-generated notes
 ├── results/
@@ -63,27 +64,19 @@ python scripts/transcribe_whisper.py --audio-dir data/audio --manifest data/meet
 
 The script saves one UTF-8 transcript per recording and `results/whisper/predictions.jsonl`. Use `--model small` for a CPU-friendly baseline; use `medium` only when sufficient memory is available. Keep the language fixed from the manifest—automatic language detection should be reported separately, not silently used.
 
-### 3. Run Tool B (IndicConformerASR)
+### 3. Run Tool B (Google Web Speech)
 
-Follow AI4Bharat's official [installation and model-download instructions](https://github.com/AI4Bharat/IndicConformerASR). For each audio file, select its matching `hi`, `ta`, or `mr` model and save UTF-8 transcripts as:
-
-```text
-results/indicconformer/hi_01.txt
-results/indicconformer/hi_02.txt
-...
-```
-
-Then import those files into the same format as the Whisper output:
+Use only consented or synthetic recordings: this runner sends audio to a web recogniser. It converts the local audio to WAV and requests the matching `hi-IN`, `ta-IN`, or `mr-IN` locale.
 
 ```powershell
-python scripts/make_predictions.py --manifest data/meeting_manifest.jsonl --transcript-dir results/indicconformer --output results/indicconformer/predictions.jsonl --tool "IndicConformer"
+python scripts/transcribe_google_web.py --audio-dir data/audio --manifest data/meeting_manifest.jsonl --output-dir results/google_web
 ```
 
 ### 4. Score both tools and document evidence
 
 ```powershell
 python scripts/evaluate_asr.py --manifest data/meeting_manifest.jsonl --predictions results/whisper/predictions.jsonl --tool "Whisper"
-python scripts/evaluate_asr.py --manifest data/meeting_manifest.jsonl --predictions results/indicconformer/predictions.jsonl --tool "IndicConformer"
+python scripts/evaluate_asr.py --manifest data/meeting_manifest.jsonl --predictions results/google_web/predictions.jsonl --tool "Google Web Speech"
 ```
 
 Copy each tool's macro and language-wise WER/CER into `REPORT.md`, write error examples from the actual output, and add the requested screenshots. This is essential: a score alone does not demonstrate the application output.
