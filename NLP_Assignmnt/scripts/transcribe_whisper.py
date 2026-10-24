@@ -37,9 +37,12 @@ def main() -> None:
 
     records: list[dict[str, Any]] = []
     for item in read_jsonl(args.manifest):
-        audio_path = args.audio_dir / f"{item['id']}.wav"
-        if not audio_path.exists():
-            print(f"SKIP {item['id']}: missing {audio_path}")
+        audio_path = next(
+            (args.audio_dir / f"{item['id']}{suffix}" for suffix in (".wav", ".mp3", ".m4a", ".flac") if (args.audio_dir / f"{item['id']}{suffix}").exists()),
+            None,
+        )
+        if audio_path is None:
+            print(f"SKIP {item['id']}: no .wav, .mp3, .m4a, or .flac file found")
             continue
 
         segments, info = model.transcribe(

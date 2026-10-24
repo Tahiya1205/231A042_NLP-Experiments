@@ -47,7 +47,7 @@ NLP_Assignmnt/
 
 ### 1. Prepare matched audio
 
-Record each reference utterance in `data/meeting_manifest.jsonl` once, in a quiet room, as 16-kHz mono WAV files named `<id>.wav` (for example, `hi_01.wav`). Each speaker must consent to the recording. Do not commit private meeting recordings. Keep them in `data/audio/`, which is ignored by Git.
+Record each reference utterance in `data/meeting_manifest.jsonl` once, in a quiet room, preferably as 16-kHz mono WAV files named `<id>.wav` (for example, `hi_01.wav`). The runner also accepts MP3, M4A and FLAC files with the same base name. Each speaker must consent to the recording. Do not commit private meeting recordings. Keep them in `data/audio/`, which is ignored by Git.
 
 For a public ASR-only benchmark, use the Hindi, Tamil and Marathi portions of [FLEURS](https://huggingface.co/datasets/google/fleurs) or [Mozilla Common Voice](https://commonvoice.mozilla.org/). Those datasets are useful for word-error measurement, but the supplied meeting-style scripts are necessary for decision/action extraction.
 

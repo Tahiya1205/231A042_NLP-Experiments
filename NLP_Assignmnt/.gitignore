@@ -3,5 +3,6 @@ data/audio/
 results/**/*.txt
 results/**/*.jsonl
 results/**/*.csv
+results/validation_oracle/
 .venv/
 __pycache__/
